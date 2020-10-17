@@ -1,3 +1,4 @@
 *.log
 *.fsdb
 lab2/src/tb_verilog/INCA_libs
+*.pdf
