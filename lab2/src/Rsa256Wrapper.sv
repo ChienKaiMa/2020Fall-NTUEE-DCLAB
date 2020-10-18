@@ -16,7 +16,7 @@ localparam TX_OK_BIT   = 6;
 localparam RX_OK_BIT   = 7;
 
 // Feel free to design your own FSM!
-localparam S_GET_KEY = 0;
+localparam S_PREPARE = 0;
 localparam S_GET_DATA = 1;
 localparam S_WAIT_CALCULATE = 2;
 localparam S_SEND_DATA = 3;
@@ -70,7 +70,7 @@ always_comb begin
     avm_write_w = avm_write_r;
     avm_address_w = avm_address_r;
     case(state_r)
-        S_GET_KEY: begin
+        S_PREPARE: begin
             n_w = n_r;
             d_w = d_r;
             enc_w = enc_r;
@@ -95,21 +95,21 @@ always_comb begin
                     n_w = (n_r<<8) + avm_readdata[7:0];
                     d_w = d_r;
                     enc_w = enc_r;
-                    state_w = S_GET_KEY;
+                    state_w = S_PREPARE;
                     rsa_start_w = rsa_start_r;
                 end
                 else if(bytes_counter_r<=7'd64) begin
                     n_w = n_r;
                     d_w = (d_r<<8) + avm_readdata[7:0];
                     enc_w = enc_r;
-                    state_w = S_GET_KEY;
+                    state_w = S_PREPARE;
                     rsa_start_w = rsa_start_r;
                 end
                 else if(bytes_counter_r<=7'd95) begin
                     n_w = n_r;
                     d_w = d_r;
                     enc_w = (enc_r<<8) + avm_readdata[7:0];
-                    state_w = S_GET_KEY;
+                    state_w = S_PREPARE;
                     rsa_start_w = rsa_start_r;
                 end
                 else begin
@@ -178,7 +178,7 @@ always_comb begin
 	                    StartRead(STATUS_BASE);
 	                    dec_w = dec_r << 8;
                         enc_w = 0;
-                        state_w = S_GET_KEY;
+                        state_w = S_PREPARE;
                         bytes_counter_w = 7'd64;
                 	end
                     else begin
@@ -202,7 +202,7 @@ always_ff @(posedge avm_clk or posedge avm_rst) begin
         avm_address_r <= STATUS_BASE;
         avm_read_r <= 1;
         avm_write_r <= 0;
-        state_r <= S_GET_KEY;
+        state_r <= S_PREPARE;
         bytes_counter_r <= 0;
         rsa_start_r <= 0;
     end else begin
