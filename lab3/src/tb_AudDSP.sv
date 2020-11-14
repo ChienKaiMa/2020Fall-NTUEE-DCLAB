@@ -19,13 +19,14 @@ module tb;
     logic start, pause, stop, fast, slow_0, slow_1;
     logic [2:0] speed;
     logic [15:0] sram_data;
-    logic [15:0] sram_addr;
+    logic [19:0] sram_addr;
     logic [15:0] dac_data;
     //logic o_aud_dacdat;
 
     //clock
     initial begin
         clock = 1'b1;
+        daclrck = 1'b1;
     end
     always begin #(`HCYCLE) clock = ~clock;
     end
@@ -112,15 +113,16 @@ module tb;
 
     //Test
     initial begin
-        rst = 1'b1; check = 1'b0; start = 1'b0; daclrck = 1'b1; 
+        rst = 1'b1; check = 1'b0; start = 1'b0; 
         stop = 1'b0; pause = 1'b0; speed = 3'b0; fast = 1'b0;
         slow_0 = 1'b0; slow_1 = 1'b0;
         #(`CYCLE * 2.5) rst = 1'b0;
         #(`CYCLE * 3) rst = 1'b1;
 
-        #(`CYCLE * 2) start = 1'b1; daclrck = 1'b0;
+        #(`CYCLE * 2) start = 1'b1;
         #(`CYCLE * 1) start = 1'b0;
-        #(`CYCLE * 20)
+        #(`CYCLE * 20) stop = 1'b1;
+        #(`CYCLE * 1) stop = 1'b0;
 
         #(`CYCLE * 2) start = 1'b1; fast = 1'b1; speed = 3'd3;
         #(`CYCLE * 1) start = 1'b0;
@@ -128,7 +130,8 @@ module tb;
         #(`CYCLE * 1) pause = 1'b0;
         #(`CYCLE * 3) start = 1'b1;
         #(`CYCLE * 1) start = 1'b0;
-        #(`CYCLE * 10)
+        #(`CYCLE * 10) stop = 1'b1;
+        #(`CYCLE * 1) stop = 1'b0;
 
         #(`CYCLE * 1) start = 1'b1; fast = 1'b0; slow_0 = 1'b1; speed = 3'd3;
         #(`CYCLE * 1) start = 1'b0;
@@ -136,7 +139,8 @@ module tb;
         #(`CYCLE * 1) pause = 1'b0;
         #(`CYCLE * 3) start = 1'b1;
         #(`CYCLE * 1) start = 1'b0;
-        #(`CYCLE * 60)
+        #(`CYCLE * 60) stop = 1'b1;
+        #(`CYCLE * 1) stop = 1'b0;
 
         #(`CYCLE * 1) start = 1'b1; slow_0 = 1'b0; slow_1 = 1'b1; speed = 3'd3;
         #(`CYCLE * 1) start = 1'b0;
@@ -144,6 +148,12 @@ module tb;
         #(`CYCLE * 1) pause = 1'b0;
         #(`CYCLE * 3) start = 1'b1;
         #(`CYCLE * 1) start = 1'b0;
+        #(`CYCLE * 60) stop = 1'b1;
+        #(`CYCLE * 1) stop = 1'b0;
+    end
+
+    always begin
+        #(`CYCLE * 1) daclrck = ~daclrck;
     end
 
     //Check

@@ -65,7 +65,8 @@ localparam S_RECORD = 2;
 localparam S_PLAY   = 3;
 logic[2:0] state_r, state_w;
 
-logic i2c_oen, i2c_sdat;
+logic i2c_oen;
+wire  i2c_sdat;
 logic [19:0] addr_record, addr_play;
 logic [15:0] data_record, data_play, dac_data;
 
@@ -197,8 +198,8 @@ always_comb begin
 	endcase
 end
 
-always_ff @(posedge i_AUD_BCLK or posedge i_rst_n) begin
-	if (!i_rst_n) begin
+always_ff @(posedge i_AUD_BCLK or negedge i_rst_n) begin
+	if (~i_rst_n) begin
 		state_r <= S_INIT;
 	end
 	else begin

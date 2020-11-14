@@ -3,7 +3,7 @@ module AudPlayer(
     input i_bclk,
     input i_daclrck,
     input i_en,
-    input [15:0] i_dac_data,
+    input signed [15:0] i_dac_data,
     output o_aud_dacdat
 );
     /*parameters*/
@@ -17,7 +17,7 @@ module AudPlayer(
     logic[4:0] counter_w, counter_r;
     
     /*output assign*/
-    assign o_aud_dacdat = o_aud_dacdat_r;
+    assign o_aud_dacdat = o_aud_dacdat_w;
 
     /*combinational circuit*/
     always_comb begin
@@ -28,20 +28,20 @@ module AudPlayer(
             S_IDLE: begin
                 if(i_en & ~i_daclrck) begin
                     state_w = S_TRANSMIT;
-                    counter_w = 5'd0;
-                    o_aud_dacdat_w = o_aud_dacdat_r;
+                    counter_w = 5'd1;
+                    o_aud_dacdat_w = i_dac_data[15-counter_r];
                 end
                 else begin
                     state_w = S_IDLE;
-                    counter_w = counter_r;
+                    counter_w = 5'd0;
                     o_aud_dacdat_w = o_aud_dacdat_r;
                 end
             end
             S_TRANSMIT: begin
-                if(counter_r == 5'd16) begin
+                if(counter_r == 5'd15) begin
                     state_w = S_WAIT;
-                    counter_w = counter_r;
-                    o_aud_dacdat_w = o_aud_dacdat_r;
+                    counter_w = 5'd0;
+                    o_aud_dacdat_w = i_dac_data[15-counter_r];
                 end
                 else begin
                     state_w = S_TRANSMIT;

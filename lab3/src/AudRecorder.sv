@@ -8,7 +8,8 @@ module AudRecorder(
 	input i_data,
 	output [19:0] o_address,
 	output [15:0] o_data,
-	output [2:0] o_state
+	output [19:0] o_stop_address //////////////////////////////////////////////////////////////////////////////////
+	//output [2:0] o_state
 );
 	logic [2:0] state, state_nxt;
 	logic [5:0] Bctr,Bctr_nxt; //bit counter for 16 bit audio 
@@ -16,7 +17,8 @@ module AudRecorder(
 	logic [15:0] data,data_nxt;
 	assign o_address = addr;
 	assign o_data = data; 
-	assign o_state = state;
+	//assign o_state = state;
+	assign o_stop_address = addr; /////////////////////////////////////////////////////////////////////////////////
 	localparam ADD_BASE = 20'b11111111111111111111; //= -1
 	localparam S_IDLE = 3'd0;
 	localparam S_WAIT = 3'd1;
@@ -28,12 +30,13 @@ module AudRecorder(
 			S_IDLE: begin
 				if(i_start) begin
 					state_nxt = S_WAIT;
+					addr_nxt = ADD_BASE;/////////////////////////////////////////////////////////////////////////////////
 				end
 				else begin
 					state_nxt = state;
+					addr_nxt = addr;//////////////////////////////////////////////////////////////////////////////////////
 				end
 				Bctr_nxt = 5'd0;
-				addr_nxt = ADD_BASE;
 				data_nxt = 16'd0;
 			end
 			S_WAIT: begin
@@ -43,7 +46,7 @@ module AudRecorder(
 				else if(i_pause) begin
 					state_nxt = S_PAUSE1;
 				end
-				else if(!i_lrc) begin //record left channel
+				else if(i_lrc) begin //record right channel
 					state_nxt = S_DATA;
 				end
 				else begin
@@ -66,13 +69,13 @@ module AudRecorder(
 					addr_nxt = addr;
 					data_nxt = 16'd0;
 				end
-				else if(Bctr<5'd16) begin //record left channel
+				else if(Bctr<5'd16) begin //record right channel
 					state_nxt = S_DATA;
 					Bctr_nxt = Bctr + 5'd1;
 					addr_nxt = addr;
 					data_nxt = {data[15:0],i_data};
 				end
-				else if(i_lrc) begin
+				else if(!i_lrc) begin
 					state_nxt = S_WAIT;
 					Bctr_nxt = 5'd0;
 					addr_nxt = addr + 20'd1; //only change o_address when output(i_lrc=1=right channel)
