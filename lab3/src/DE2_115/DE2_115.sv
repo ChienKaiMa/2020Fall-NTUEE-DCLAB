@@ -98,7 +98,7 @@ module DE2_115 (
 	input OTG_INT,
 	output OTG_RST_N,
 	input IRDA_RXD,
-	output [12:0] DRAM_ADDR,
+	output [12:0] DRAM_ADDR, ///////
 	output [1:0] DRAM_BA,
 	output DRAM_CAS_N,
 	output DRAM_CKE,
@@ -107,7 +107,7 @@ module DE2_115 (
 	inout [31:0] DRAM_DQ,
 	output [3:0] DRAM_DQM,
 	output DRAM_RAS_N,
-	output DRAM_WE_N,
+	output DRAM_WE_N, //////
 	output [19:0] SRAM_ADDR,
 	output SRAM_CE_N,
 	inout [15:0] SRAM_DQ,
@@ -138,15 +138,16 @@ module DE2_115 (
 
 logic key0down, key1down, key2down, key3down;
 logic CLK_12M, CLK_100K, CLK_800K;
+logic [5:0] DISPLAY_TIME;
 
 assign AUD_XCK = CLK_12M;
 
-Altpll pll0( // generate with qsys, please follow lab2 tutorials
+audio pll0( // generate with qsys, please follow lab2 tutorials
 	.clk_clk(CLOCK_50),
 	.reset_reset_n(key3down),
 	.altpll_12m_clk(CLK_12M),
-	.altpll_100k_clk(CLK_100K),
-	.altpll_800k_clk(CLK_800K)
+	.altpll_100k_clk(CLK_100K)
+	//.altpll_800k_clk(CLK_800K)
 );
 
 // you can decide key down settings on your own, below is just an example
@@ -171,15 +172,46 @@ Debounce deb2(
 	.o_neg(key2down) 
 );
 
+//logic [15:0] W_D, R_D;
+/*logic [25:0] o_D_addr;
+logic [15:0] o_D_wdata;
+logic [15:0] i_D_rdata;
+logic o_D_we_n;
+
+dram_control dram(
+	.clk_clk(CLK_12M),                                 //                         clk.clk
+	.new_sdram_controller_0_s1_address(o_D_addr),       //   new_sdram_controller_0_s1.address  [25:0]
+	.new_sdram_controller_0_s1_byteenable_n(),  //                            .byteenable_n
+	.new_sdram_controller_0_s1_chipselect(0),    //                            .chipselect
+	.new_sdram_controller_0_s1_writedata(o_D_wdata),     //                            .writedata
+	.new_sdram_controller_0_s1_read_n(o_D_we_n),        //                            .read_n
+	.new_sdram_controller_0_s1_write_n(~o_D_we_n),       //                            .write_n
+	.new_sdram_controller_0_s1_readdata(i_D_rdata),      //                            .readdata
+	.new_sdram_controller_0_s1_readdatavalid(), //                            .readdatavalid
+	.new_sdram_controller_0_s1_waitrequest(),   //                            .waitrequest
+	.new_sdram_controller_0_wire_addr(DRAM_ADDR),        // new_sdram_controller_0_wire.addr
+	.new_sdram_controller_0_wire_ba(DRAM_BA),          //                            .ba
+	.new_sdram_controller_0_wire_cas_n(DRAM_CAS_N),       //                            .cas_n
+	.new_sdram_controller_0_wire_cke(DRAM_CKE),         //                            .cke
+	.new_sdram_controller_0_wire_cs_n(DRAM_CS_N),        //                            .cs_n
+	.new_sdram_controller_0_wire_dq(DRAM_DQ),          //                            .dq
+	.new_sdram_controller_0_wire_dqm(DRAM_DQM),         //                            .dqm
+	.new_sdram_controller_0_wire_ras_n(DRAM_RAS_N),       //                            .ras_n
+	.new_sdram_controller_0_wire_we_n(DRAM_WE_N),        //                            .we_n
+	.reset_reset_n(KEY[3])                            //                   	.
+);*/
 Top top0(
 	.i_rst_n(KEY[3]),
 	.i_clk(CLK_12M),
 	.i_key_0(key0down),
 	.i_key_1(key1down),
 	.i_key_2(key2down),
-	// .i_speed(SW[3:0]), // design how user can decide mode on your own
+	.i_speed(SW[2:0]),
+	.i_fast(SW[3]),
+	.i_slow_0(SW[4]),
+	.i_slow_1(SW[5]),
 	
-	// AudDSP and SRAM
+	//AudDSP and SRAM
 	.o_SRAM_ADDR(SRAM_ADDR), // [19:0]
 	.io_SRAM_DQ(SRAM_DQ), // [15:0]
 	.o_SRAM_WE_N(SRAM_WE_N),
@@ -187,6 +219,11 @@ Top top0(
 	.o_SRAM_OE_N(SRAM_OE_N),
 	.o_SRAM_LB_N(SRAM_LB_N),
 	.o_SRAM_UB_N(SRAM_UB_N),
+	//.o_D_addr(o_D_addr),
+	//.o_D_wdata(o_D_wdata),
+	//.i_D_rdata(i_D_rdata),
+	//.o_D_we_n(o_D_we_n),
+
 	
 	// I2C
 	.i_clk_100k(CLK_100K),
@@ -198,9 +235,10 @@ Top top0(
 	.i_AUD_ADCLRCK(AUD_ADCLRCK),
 	.i_AUD_BCLK(AUD_BCLK),
 	.i_AUD_DACLRCK(AUD_DACLRCK),
-	.o_AUD_DACDAT(AUD_DACDAT)
+	.o_AUD_DACDAT(AUD_DACDAT),
 
 	// SEVENDECODER (optional display)
+	.o_display_time(DISPLAY_TIME)
 	// .o_record_time(recd_time),
 	// .o_play_time(play_time),
 
@@ -218,21 +256,21 @@ Top top0(
 	// .o_ledr(LEDR) // [17:0]
 );
 
-// SevenHexDecoder seven_dec0(
-// 	.i_num(play_time),
+//SevenHexDecoder seven_dec0(
+// 	.i_hex(DISPLAY_TIME),																																																																																																																																																																																																																																																																																																																																																																																											(play_time),
 // 	.o_seven_ten(HEX1),
 // 	.o_seven_one(HEX0)
-// );
+//);
 
-// SevenHexDecoder seven_dec1(
-// 	.i_num(recd_time),
-// 	.o_seven_ten(HEX5),
-//  	.o_seven_one(HEX4)
-// );
+ SevenHexDecoder seven_dec1(
+ 	.i_hex(DISPLAY_TIME),
+ 	.o_seven_ten(HEX1),
+  	.o_seven_one(HEX0)
+ );
 
 // comment those are use for display
-assign HEX0 = '1;
-assign HEX1 = '1;
+//assign HEX0 = '1;
+//assign HEX1 = '1;
 assign HEX2 = '1;
 assign HEX3 = '1;
 assign HEX4 = '1;

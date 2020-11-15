@@ -1,5 +1,5 @@
 module SevenHexDecoder (
-	input        [3:0] i_hex,
+	input        [5:0] i_hex,
 	output logic [6:0] o_seven_ten,
 	output logic [6:0] o_seven_one
 );
@@ -23,22 +23,40 @@ parameter D8 = 7'b0000000;
 parameter D9 = 7'b0010000;
 always_comb begin
 	case(i_hex)
-		4'h0: begin o_seven_ten = D0; o_seven_one = D0; end
-		4'h1: begin o_seven_ten = D0; o_seven_one = D1; end
-		4'h2: begin o_seven_ten = D0; o_seven_one = D2; end
-		4'h3: begin o_seven_ten = D0; o_seven_one = D3; end
-		4'h4: begin o_seven_ten = D0; o_seven_one = D4; end
-		4'h5: begin o_seven_ten = D0; o_seven_one = D5; end
-		4'h6: begin o_seven_ten = D0; o_seven_one = D6; end
-		4'h7: begin o_seven_ten = D0; o_seven_one = D7; end
-		4'h8: begin o_seven_ten = D0; o_seven_one = D8; end
-		4'h9: begin o_seven_ten = D0; o_seven_one = D9; end
-		4'ha: begin o_seven_ten = D1; o_seven_one = D0; end
-		4'hb: begin o_seven_ten = D1; o_seven_one = D1; end
-		4'hc: begin o_seven_ten = D1; o_seven_one = D2; end
-		4'hd: begin o_seven_ten = D1; o_seven_one = D3; end
-		4'he: begin o_seven_ten = D1; o_seven_one = D4; end
-		4'hf: begin o_seven_ten = D1; o_seven_one = D5; end
+		6'd0 : begin o_seven_ten = D0; o_seven_one = D0; end
+		6'd1 : begin o_seven_ten = D0; o_seven_one = D1; end
+		6'd2 : begin o_seven_ten = D0; o_seven_one = D2; end
+		6'd3 : begin o_seven_ten = D0; o_seven_one = D3; end
+		6'd4 : begin o_seven_ten = D0; o_seven_one = D4; end
+		6'd5 : begin o_seven_ten = D0; o_seven_one = D5; end
+		6'd6 : begin o_seven_ten = D0; o_seven_one = D6; end
+		6'd7 : begin o_seven_ten = D0; o_seven_one = D7; end
+		6'd8 : begin o_seven_ten = D0; o_seven_one = D8; end
+		6'd9 : begin o_seven_ten = D0; o_seven_one = D9; end
+		6'd10: begin o_seven_ten = D1; o_seven_one = D0; end
+		6'd11: begin o_seven_ten = D1; o_seven_one = D1; end
+		6'd12: begin o_seven_ten = D1; o_seven_one = D2; end
+		6'd13: begin o_seven_ten = D1; o_seven_one = D3; end
+		6'd14: begin o_seven_ten = D1; o_seven_one = D4; end
+		6'd15: begin o_seven_ten = D1; o_seven_one = D5; end
+		6'd16: begin o_seven_ten = D1; o_seven_one = D6; end
+		6'd17: begin o_seven_ten = D1; o_seven_one = D7; end
+		6'd18: begin o_seven_ten = D1; o_seven_one = D8; end
+		6'd19: begin o_seven_ten = D1; o_seven_one = D9; end
+		6'd20: begin o_seven_ten = D2; o_seven_one = D0; end
+		6'd21: begin o_seven_ten = D2; o_seven_one = D1; end
+		6'd22: begin o_seven_ten = D2; o_seven_one = D2; end
+		6'd23: begin o_seven_ten = D2; o_seven_one = D3; end
+		6'd24: begin o_seven_ten = D2; o_seven_one = D4; end
+		6'd25: begin o_seven_ten = D2; o_seven_one = D5; end
+		6'd26: begin o_seven_ten = D2; o_seven_one = D6; end
+		6'd27: begin o_seven_ten = D2; o_seven_one = D7; end
+		6'd28: begin o_seven_ten = D2; o_seven_one = D8; end
+		6'd29: begin o_seven_ten = D2; o_seven_one = D9; end
+		6'd30: begin o_seven_ten = D3; o_seven_one = D0; end
+		6'd31: begin o_seven_ten = D3; o_seven_one = D1; end
+		6'd32: begin o_seven_ten = D3; o_seven_one = D2; end
+		default: begin o_seven_ten = D3; o_seven_one = D2; end
 	endcase
 end
 
