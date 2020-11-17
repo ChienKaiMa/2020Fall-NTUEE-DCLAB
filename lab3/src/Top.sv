@@ -8,6 +8,7 @@ module Top (
 	input i_fast,
 	input i_slow_0,
 	input i_slow_1,
+	input i_reverse,
 	
 	// AudDSP and SRAM
 	//output [25:0] o_D_addr,
@@ -35,7 +36,7 @@ module Top (
 	output o_AUD_DACDAT,
 
 	// SEVENDECODER (optional display)
-	output [5:0] o_display_time
+	output [5:0] o_display_time,
 	// output [5:0] o_play_time,
 
 	// LCD (optional display)
@@ -49,7 +50,7 @@ module Top (
 
 	// LED
 	// output  [8:0] o_ledg,
-	// output [17:0] o_ledr
+	output [17:0] o_ledr
 );
 
 	// design the FSM and states as you like
@@ -126,6 +127,7 @@ module Top (
 		.i_fast(i_fast),
 		.i_slow_0(i_slow_0), // constant interpolation
 		.i_slow_1(i_slow_1), // linear interpolation
+		.i_reverse(i_reverse),
 		.i_daclrck(i_AUD_DACLRCK),
 		.i_sram_data(data_play),
 		.i_stop_addr(stop_addr),
@@ -159,18 +161,29 @@ module Top (
 		.o_data(data_record)
 	);
 
-	// === SevenSegmentDisplay ===
-	//SevenSegmentDisplay seven0(
-	//	.rst_n(i_rst_n),
-	//	.clk_100k(i_clk_100k),
-	//	.recorder_start(recorder_start),
-	//	.recorder_pause(recorder_pause),
-	//	.recorder_stop(recorder_stop),
-	//	.player_start(dsp_start),
-	//	.player_pause(dsp_pause),
-	//	.player_stop(dsp_stop),
-	//	.o_display(o_display_time)
-	//);
+	//=== SevenSegmentDisplay ===
+	SevenSegmentDisplayTime seven0(
+		.rst_n(i_rst_n),
+		.clk(i_clk),
+		.recorder_start(recorder_start),
+		.recorder_pause(recorder_pause),
+		.recorder_stop(recorder_stop),
+		.player_start(dsp_start),
+		.player_pause(dsp_pause),
+		.player_stop(dsp_stop),
+		.i_speed(i_speed),
+		.i_fast(i_fast),
+		.i_slow(i_slow_0 || i_slow_1),
+		.i_state(state_r == S_PLAY),
+		.o_display(o_display_time)
+	);
+
+	//=== LED ===
+	LEDVolume led0(
+		.i_record(state_r == S_RECORD),
+		.i_data(data_record),
+		.o_led_r(o_ledr)
+	);
 
 	always_comb begin
 		// design your control here
@@ -254,92 +267,5 @@ module Top (
 			i2c_start <= 1;
 		end
 	end
-
-
-	//7 segment display part
-	    //parameters
-    localparam S_7_IDLE  = 0;
-    localparam S_7_COUNT = 1;
-    localparam S_7_PAUSE = 2;
-    localparam Second  = 26'd12000000;
-
-    //registers and wires
-    logic [1:0]  state_r_7, state_w_7;
-    logic [25:0] cycle_counter_r_7, cycle_counter_w_7;
-    logic [5:0]  o_display_r_7, o_display_w_7;
-
-    //output
-    assign o_display_time = o_display_r_7;//(recorder_start || player_start);/*{4'b0, state_r}*/
-
-    //combinational circuit
-    always_comb begin
-        case(state_r_7)
-            S_7_IDLE: begin
-                if(recorder_start || dsp_start) begin
-                    state_w_7 = S_7_COUNT;
-                    cycle_counter_w_7 = 25'd1;
-                    o_display_w_7 = 6'd0;
-                end
-                else begin
-                    state_w_7 = state_r_7;
-                    cycle_counter_w_7 = 25'd0;
-                    o_display_w_7 = 6'd0;
-                end
-            end
-            S_7_COUNT: begin
-                if(recorder_stop || dsp_stop) begin
-                    state_w_7 = S_7_IDLE;
-                    cycle_counter_w_7 = 25'd0;
-                    o_display_w_7 = 6'd0;
-                end
-                else if(recorder_pause || dsp_pause) begin
-                    state_w_7 = S_7_PAUSE;
-                    cycle_counter_w_7 = cycle_counter_r_7;
-                    o_display_w_7 = o_display_r_7;
-                end
-                else begin
-                    state_w_7 = state_r_7;
-                    cycle_counter_w_7 = (cycle_counter_r_7 == Second)? 25'd1 : (cycle_counter_r_7 + 25'd1);
-                    o_display_w_7 = (cycle_counter_r_7 == Second)? o_display_r_7 + 6'd1 : o_display_r_7;
-                end
-            end
-            S_7_PAUSE: begin
-                if(recorder_start || dsp_start) begin
-                    state_w_7 = S_7_COUNT;
-                    cycle_counter_w_7 = (cycle_counter_r_7 == Second)? 25'd1 : (cycle_counter_r_7 + 25'd1);
-                    o_display_w_7 = (cycle_counter_r_7 == Second)? o_display_r_7 + 6'd1 : o_display_r_7;
-                end
-                else if(recorder_stop || dsp_stop) begin
-                    state_w_7 = S_7_IDLE;
-                    cycle_counter_w_7 = 25'd0;
-                    o_display_w_7 = 6'd0;
-                end
-                else begin
-                    state_w_7 = state_r_7;
-                    cycle_counter_w_7 = cycle_counter_r_7;
-                    o_display_w_7 = o_display_r_7;
-                end
-            end
-            default: begin
-                state_w_7 = state_r_7;
-                cycle_counter_w_7 = 25'd0;
-                o_display_w_7 = 6'd0;
-            end
-        endcase
-    end
-    
-    //sequential circuit
-    always_ff@(posedge i_clk or negedge i_rst_n) begin
-        if(~i_rst_n) begin
-            state_r_7         <= S_7_IDLE;
-            cycle_counter_r_7 <= 25'd0;
-            o_display_r_7     <= 6'd1;
-        end
-        else begin
-            state_r_7         <= state_w_7;
-            cycle_counter_r_7 <= cycle_counter_w_7;
-            o_display_r_7     <= o_display_w_7;
-        end
-    end
 
 endmodule

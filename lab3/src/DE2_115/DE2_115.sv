@@ -173,33 +173,33 @@ Debounce deb2(
 );
 
 //logic [15:0] W_D, R_D;
-/*logic [25:0] o_D_addr;
-logic [15:0] o_D_wdata;
-logic [15:0] i_D_rdata;
-logic o_D_we_n;
-
-dram_control dram(
-	.clk_clk(CLK_12M),                                 //                         clk.clk
-	.new_sdram_controller_0_s1_address(o_D_addr),       //   new_sdram_controller_0_s1.address  [25:0]
-	.new_sdram_controller_0_s1_byteenable_n(),  //                            .byteenable_n
-	.new_sdram_controller_0_s1_chipselect(0),    //                            .chipselect
-	.new_sdram_controller_0_s1_writedata(o_D_wdata),     //                            .writedata
-	.new_sdram_controller_0_s1_read_n(o_D_we_n),        //                            .read_n
-	.new_sdram_controller_0_s1_write_n(~o_D_we_n),       //                            .write_n
-	.new_sdram_controller_0_s1_readdata(i_D_rdata),      //                            .readdata
-	.new_sdram_controller_0_s1_readdatavalid(), //                            .readdatavalid
-	.new_sdram_controller_0_s1_waitrequest(),   //                            .waitrequest
-	.new_sdram_controller_0_wire_addr(DRAM_ADDR),        // new_sdram_controller_0_wire.addr
-	.new_sdram_controller_0_wire_ba(DRAM_BA),          //                            .ba
-	.new_sdram_controller_0_wire_cas_n(DRAM_CAS_N),       //                            .cas_n
-	.new_sdram_controller_0_wire_cke(DRAM_CKE),         //                            .cke
-	.new_sdram_controller_0_wire_cs_n(DRAM_CS_N),        //                            .cs_n
-	.new_sdram_controller_0_wire_dq(DRAM_DQ),          //                            .dq
-	.new_sdram_controller_0_wire_dqm(DRAM_DQM),         //                            .dqm
-	.new_sdram_controller_0_wire_ras_n(DRAM_RAS_N),       //                            .ras_n
-	.new_sdram_controller_0_wire_we_n(DRAM_WE_N),        //                            .we_n
-	.reset_reset_n(KEY[3])                            //                   	.
-);*/
+//logic [25:0] o_D_addr;
+//logic [15:0] o_D_wdata;
+//logic [15:0] i_D_rdata;
+//logic o_D_we_n;
+//
+//dram_control dram(
+//	.clk_clk(CLK_12M),                                 //                         clk.clk
+//	.new_sdram_controller_0_s1_address(o_D_addr),       //   new_sdram_controller_0_s1.address  [25:0]
+//	.new_sdram_controller_0_s1_byteenable_n(),  //                            .byteenable_n
+//	.new_sdram_controller_0_s1_chipselect(0),    //                            .chipselect
+//	.new_sdram_controller_0_s1_writedata(o_D_wdata),     //                            .writedata
+//	.new_sdram_controller_0_s1_read_n(o_D_we_n),        //                            .read_n
+//	.new_sdram_controller_0_s1_write_n(~o_D_we_n),       //                            .write_n
+//	.new_sdram_controller_0_s1_readdata(i_D_rdata),      //                            .readdata
+//	.new_sdram_controller_0_s1_readdatavalid(), //                            .readdatavalid
+//	.new_sdram_controller_0_s1_waitrequest(),   //                            .waitrequest
+//	.new_sdram_controller_0_wire_addr(DRAM_ADDR),        // new_sdram_controller_0_wire.addr
+//	.new_sdram_controller_0_wire_ba(DRAM_BA),          //                            .ba
+//	.new_sdram_controller_0_wire_cas_n(DRAM_CAS_N),       //                            .cas_n
+//	.new_sdram_controller_0_wire_cke(DRAM_CKE),         //                            .cke
+//	.new_sdram_controller_0_wire_cs_n(DRAM_CS_N),        //                            .cs_n
+//	.new_sdram_controller_0_wire_dq(DRAM_DQ),          //                            .dq
+//	.new_sdram_controller_0_wire_dqm(DRAM_DQM),         //                            .dqm
+//	.new_sdram_controller_0_wire_ras_n(DRAM_RAS_N),       //                            .ras_n
+//	.new_sdram_controller_0_wire_we_n(DRAM_WE_N),        //                            .we_n
+//	.reset_reset_n(KEY[3])                            //                   	.
+//);
 Top top0(
 	.i_rst_n(KEY[3]),
 	.i_clk(CLK_12M),
@@ -210,6 +210,7 @@ Top top0(
 	.i_fast(SW[3]),
 	.i_slow_0(SW[4]),
 	.i_slow_1(SW[5]),
+	.i_reverse(SW[6]),
 	
 	//AudDSP and SRAM
 	.o_SRAM_ADDR(SRAM_ADDR), // [19:0]
@@ -238,7 +239,7 @@ Top top0(
 	.o_AUD_DACDAT(AUD_DACDAT),
 
 	// SEVENDECODER (optional display)
-	.o_display_time(DISPLAY_TIME)
+	.o_display_time(DISPLAY_TIME),
 	// .o_record_time(recd_time),
 	// .o_play_time(play_time),
 
@@ -253,29 +254,36 @@ Top top0(
 
 	// LED
 	// .o_ledg(LEDG), // [8:0]
-	// .o_ledr(LEDR) // [17:0]
+	.o_ledr(LEDR) // [17:0]
 );
 
-//SevenHexDecoder seven_dec0(
-// 	.i_hex(DISPLAY_TIME),																																																																																																																																																																																																																																																																																																																																																																																											(play_time),
-// 	.o_seven_ten(HEX1),
-// 	.o_seven_one(HEX0)
-//);
-
+//seven segment
  SevenHexDecoder seven_dec1(
  	.i_hex(DISPLAY_TIME),
  	.o_seven_ten(HEX1),
   	.o_seven_one(HEX0)
  );
 
+ SevenHexDecoder seven_dec2(
+ 	.i_hex(SW[2:0] + 5'b1),
+ 	.o_seven_ten(HEX5),
+  	.o_seven_one(HEX4)
+ );
+ 
+ assign HEX7 = (SW[3]) ? 7'b0001110 :
+			   (SW[4] || SW[5]) ? 7'b0010010 : 
+			   (SW[6]) ? 7'b0001000 : 7'b1000000;
+ assign HEX6 = (SW[4]) ? 7'b1000000 :
+			   (SW[5]) ? 7'b1111001 : '1;
+
 // comment those are use for display
 //assign HEX0 = '1;
 //assign HEX1 = '1;
 assign HEX2 = '1;
 assign HEX3 = '1;
-assign HEX4 = '1;
-assign HEX5 = '1;
-assign HEX6 = '1;
-assign HEX7 = '1;
+//assign HEX4 = '1;
+//assign HEX5 = '1;
+//assign HEX6 = '1;
+//assign HEX7 = '1;
 
 endmodule
