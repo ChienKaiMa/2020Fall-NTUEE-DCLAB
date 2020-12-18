@@ -98,6 +98,56 @@ module vga(
         vga_r_w = pixel_value;
         vga_g_w = pixel_value;
         vga_b_w = pixel_value;
+        //if (0 <= x_cnt_r && x_cnt_r <= 143) begin
+        //    vga_r_w = 8'd25;//8'b00000000;
+        //    vga_g_w = 8'd25;//8'b00000000;
+        //    vga_b_w = 8'd25;//8'b00000000;
+        //end
+        //else if (144 <= x_cnt_r && x_cnt_r <= 223) begin
+        //    vga_r_w = 8'd50;//8'b11111111;
+        //    vga_g_w = 8'd50;//8'b00000000;
+        //    vga_b_w = 8'd50;//8'b00000000;
+        //end
+        //else if (224 <= x_cnt_r && x_cnt_r <= 303) begin
+        //    vga_r_w = 8'd75;//8'b11111111;
+        //    vga_g_w = 8'd75;//8'b10101010;
+        //    vga_b_w = 8'd75;//8'b00000000;
+        //end
+        //else if (304 <= x_cnt_r && x_cnt_r <= 383) begin
+        //    vga_r_w = 8'd100;//8'b00000000;
+        //    vga_g_w = 8'd100;//8'b11111111;
+        //    vga_b_w = 8'd100;//8'b00000000;
+        //end
+        //else if (384 <= x_cnt_r && x_cnt_r <= 463) begin
+        //    vga_r_w = 8'd125;//8'b00000000;
+        //    vga_g_w = 8'd125;//8'b11111111;
+        //    vga_b_w = 8'd125;//8'b11111111;
+        //end
+        //else if (464 <= x_cnt_r && x_cnt_r <= 543) begin
+        //    vga_r_w = 8'd150;//8'b11111111;
+        //    vga_g_w = 8'd150;//8'b00000000;
+        //    vga_b_w = 8'd150;//8'b11111111;
+        //end
+        //else if (544 <= x_cnt_r && x_cnt_r <= 623) begin
+        //    vga_r_w = 8'd175;//8'b00000000;
+        //    vga_g_w = 8'd175;//8'b00000000;
+        //    vga_b_w = 8'd175;//8'b11111111;
+        //end
+        //else if (624 <= x_cnt_r && x_cnt_r <= 703) begin
+        //    vga_r_w = 8'd200;//8'b00000000;
+        //    vga_g_w = 8'd200;//8'b00000000;
+        //    vga_b_w = 8'd200;//8'b00000000;
+        //end
+        //else if (704 <= x_cnt_r && x_cnt_r <= 783) begin
+        //    vga_r_w = 8'd225;//8'b11111111;
+        //    vga_g_w = 8'd225;//8'b11111111;
+        //    vga_b_w = 8'd225;//8'b11111111;
+        //end
+        //else begin
+        //    vga_r_w = 8'd255;//8'b11111111;
+        //    vga_g_w = 8'd255;//8'b11111111;
+        //    vga_b_w = 8'd255;//8'b11111111;
+        //end
     end
 
     // Flip-flop

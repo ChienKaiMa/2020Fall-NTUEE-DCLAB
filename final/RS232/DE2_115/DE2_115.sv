@@ -136,13 +136,49 @@ module DE2_115 (
 	inout [6:0] EX_IO
 );
 
+logic  [4:0] avm_address;
+logic        avm_read;
+logic [31:0] avm_readdata;
+logic        avm_write;
+logic        avm_waitrequest;
+
+logic clock_25m;
+
+final_wrapper pll0(
+	.clk_clk(CLOCK_50),       //     clk.clk
+	.clk_25m_clk(clock_25m),   // clk_25m.clk
+	.reset_reset_n(KEY[3])  //   reset.reset_n
+);
+
+Wrapper wrapper0 (
+    //RS232
+    .avm_rst(KEY[3]),
+    .avm_clk(clock_25m),
+    .avm_address(avm_address),
+    .avm_read(avm_read),
+    .avm_readdata(avm_readdata),
+    .avm_write(avm_write),
+    //output [31:0] avm_writedata,
+    .avm_waitrequest(avm_waitrequest),
+
+    //VGA
+    .VGA_B(VGA_B),
+	.VGA_BLANK_N(VGA_BLANK_N),
+	.VGA_CLK(VGA_CLK),
+	.VGA_G(VGA_G),
+	.VGA_HS(VGA_HS),
+	.VGA_R(VGA_R),
+	.VGA_SYNC_N(VGA_SYNC_N),
+	.VGA_VS(VGA_VS)
+);
+
 // please replace this module with the qsys module you generated
 // and connect all the ports
-rsa_qsys my_qsys(
-	.clk_clk(CLOCK_50),
-	.reset_reset_n(KEY[0]),
-	.uart_0_external_connection_rxd(UART_RXD),
-	.uart_0_external_connection_txd(UART_TXD)
-);
+// rsa_qsys my_qsys(
+// 	.clk_clk(CLOCK_50),
+// 	.reset_reset_n(KEY[0]),
+// 	.uart_0_external_connection_rxd(UART_RXD),
+// 	.uart_0_external_connection_txd(UART_TXD)
+// );
 
 endmodule

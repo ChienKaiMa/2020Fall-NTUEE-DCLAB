@@ -22,7 +22,7 @@ module Wrapper (
 
     logic [7:0] pixel_value;
 
-    RS232 rs2320(
+    RS232 rs232_0(
         .avm_rst(avm_rst),
         .avm_clk(avm_clk),
         .avm_address(avm_address),

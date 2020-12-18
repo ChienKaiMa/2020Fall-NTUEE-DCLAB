@@ -54,16 +54,70 @@ module RS232(
     endtask
 
     //test begin
+    logic [9:0] x_cnt_r, x_cnt_w;
+    logic [9:0] y_cnt_r, y_cnt_w;
     logic [18:0] counter_r, counter_w;
     always_comb begin
-        if(counter_r == 19'd420000) begin
-            counter_w = 19'd0;
+        if (x_cnt_r == 800) begin
+            x_cnt_w = 0;
         end
         else begin
-            counter_w = counter_r + 19'd1;
+            x_cnt_w = x_cnt_r + 1;
         end
     end
+
     always_comb begin
+        if (y_cnt_r == 525) begin
+            y_cnt_w = 0;
+        end
+        else if (x_cnt_r == 800) begin
+            y_cnt_w = y_cnt_r + 1;
+        end
+        else begin
+            y_cnt_w = y_cnt_r;
+        end
+    end
+
+    always_comb begin
+        if(counter_r == 19'd420524) begin
+            counter_w = 0;
+        end
+        else begin
+            counter_w = counter_r + 1;            
+        end
+    end
+
+    always_comb begin
+        //if (0 <= x_cnt_r && x_cnt_r <= 143) begin
+        //    pixel_value_w = 8'd25;
+        //end
+        //else if (144 <= x_cnt_r && x_cnt_r <= 223) begin
+        //    pixel_value_w = 8'd50;
+        //end
+        //else if (224 <= x_cnt_r && x_cnt_r <= 303) begin
+        //    pixel_value_w = 8'd75;
+        //end
+        //else if (304 <= x_cnt_r && x_cnt_r <= 383) begin
+        //    pixel_value_w = 8'd100;
+        //end
+        //else if (384 <= x_cnt_r && x_cnt_r <= 463) begin
+        //    pixel_value_w = 8'd125;
+        //end
+        //else if (464 <= x_cnt_r && x_cnt_r <= 543) begin
+        //    pixel_value_w = 8'd150;
+        //end
+        //else if (544 <= x_cnt_r && x_cnt_r <= 623) begin
+        //    pixel_value_w = 8'd175;
+        //end
+        //else if (624 <= x_cnt_r && x_cnt_r <= 703) begin
+        //    pixel_value_w = 8'd200;
+        //end
+        //else if (704 <= x_cnt_r && x_cnt_r <= 783) begin
+        //    pixel_value_w = 8'd225;
+        //end
+        //else begin
+        //    pixel_value_w = 8'd255;
+        //end
         if(counter_r <= 19'd40000) begin
             pixel_value_w = 8'd20;
         end
@@ -98,13 +152,17 @@ module RS232(
             pixel_value_w = 8'd220;
         end
     end
-    always_ff @(posedge avm_clk or posedge avm_rst) begin
-        if(avm_rst) begin
+    always_ff @(posedge avm_clk or negedge avm_rst) begin
+        if(!avm_rst) begin
             pixel_value_r <= 8'b0;
-            counter_r <= 19'b0;
+            x_cnt_r <= 0;   
+            y_cnt_r <= 0;
+            counter_r <= 0;
         end
         else begin
             pixel_value_r <= pixel_value_w;
+            x_cnt_r <= x_cnt_w;
+            y_cnt_r <= y_cnt_w;
             counter_r <= counter_w;
         end
     end
