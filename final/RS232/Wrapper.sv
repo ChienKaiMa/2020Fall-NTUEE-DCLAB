@@ -20,6 +20,13 @@ module Wrapper (
 	output        VGA_VS,
 
     //SRAM
+    //output [19:0] o_SRAM_ADDR,
+	//inout  [15:0] io_SRAM_DQ,
+	//output        o_SRAM_WE_N,
+	//output        o_SRAM_CE_N,
+	//output        o_SRAM_OE_N,
+	//output        o_SRAM_LB_N,
+	//output        o_SRAM_UB_N,
 
     //LED(test)
     output [7:0] LED_value
