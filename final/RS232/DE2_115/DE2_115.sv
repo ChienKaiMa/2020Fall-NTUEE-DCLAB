@@ -141,6 +141,7 @@ logic        avm_read;
 logic [31:0] avm_readdata;
 logic        avm_write;
 logic        avm_waitrequest;
+logic [7:0]  led_value;
 
 logic clock_25m;
 
@@ -169,8 +170,20 @@ Wrapper wrapper0 (
 	.VGA_HS(VGA_HS),
 	.VGA_R(VGA_R),
 	.VGA_SYNC_N(VGA_SYNC_N),
-	.VGA_VS(VGA_VS)
+	.VGA_VS(VGA_VS),
+
+	//LED
+	.LED_value(led_value)
 );
+
+	assign HEX0 = (led_value[0] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX1 = (led_value[1] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX2 = (led_value[2] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX3 = (led_value[3] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX4 = (led_value[4] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX5 = (led_value[5] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX6 = (led_value[6] == 1'b0) ? 7'b1000000 : 7'b1111001;
+	assign HEX7 = (led_value[7] == 1'b0) ? 7'b1000000 : 7'b1111001;
 
 // please replace this module with the qsys module you generated
 // and connect all the ports

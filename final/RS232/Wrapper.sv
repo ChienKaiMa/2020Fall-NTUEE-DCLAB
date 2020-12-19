@@ -17,10 +17,16 @@ module Wrapper (
 	output        VGA_HS,
 	output [7:0]  VGA_R,
 	output        VGA_SYNC_N,
-	output        VGA_VS
+	output        VGA_VS,
+
+    //SRAM
+
+    //LED(test)
+    output [7:0] LED_value
 );
 
     logic [7:0] pixel_value;
+    assign LED_value = pixel_value;
 
     RS232 rs232_0(
         .avm_rst(avm_rst),
