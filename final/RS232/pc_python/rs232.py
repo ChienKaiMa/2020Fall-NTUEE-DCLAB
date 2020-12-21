@@ -13,17 +13,18 @@ s = Serial(
     rtscts=False
 )
 
-fp = open('mountain.bmp', 'rb')
+fp = open('mountain.bin', 'rb')
 fw = open('image.out', 'wb')
-assert fp and fw
+assert fp
 
 image = fp.read()
 print(len(image))
 #fw.write(image)
+#s.write(image)
 
-for i in range(0, len(image)):
-    s.write(image[i:i+8])
-    #fw.write(image[i:i+8])
+for i in range(1077, len(image)):
+    s.write(image[i])
+    fw.write(image[i])
     #print(len(image[i]))
 
 fp.close()
