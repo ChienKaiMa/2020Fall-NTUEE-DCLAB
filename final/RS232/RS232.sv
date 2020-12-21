@@ -1,16 +1,18 @@
 module RS232(
-    //For DE2-115
+    //DE2-115
     input         avm_rst,
     input         avm_clk,
     output [4:0]  avm_address,
     output        avm_read,
     input  [31:0] avm_readdata,
-    output        avm_write,
-    //output [31:0] avm_writedata,
     input         avm_waitrequest,
 
-    //For SRAM
-    output [7:0]  pixel_value
+    //SRAM
+    output [7:0]  pixel_value,
+    output [19:0] addr_store,
+
+    //Wrapper
+    output store_finish
 );
 
     localparam RX_BASE     = 0*4;
@@ -24,31 +26,27 @@ module RS232(
     //localparam S_WAIT_CALCULATE = 2;
     //localparam S_SEND_DATA = 3;
 
+    localparam IMAGE_SIZE = 640*480*1; //bytes
+
     logic [1:0] state_r, state_w;
     logic [19:0] bytes_counter_r, bytes_counter_w;
     logic [4:0] avm_address_r, avm_address_w;
     logic avm_read_r, avm_read_w, avm_write_r, avm_write_w;
     logic [7:0] pixel_value_r, pixel_value_w;
+    logic [19:0] addr_store_r, addr_store_w;
+    logic store_finish_r, store_finish_w;
 
-    assign avm_address = avm_address_r;
-    assign avm_read = avm_read_r;
-    assign avm_write = avm_write_r;
-    //assign avm_writedata = dec_r[247-:8]; //247~240
-    assign pixel_value = pixel_value_r;
+    assign avm_address  = avm_address_r;
+    assign avm_read     = avm_read_r;
+    assign pixel_value  = pixel_value_r;
+    assign addr_store   = addr_store_r;
+    assign store_finish = store_finish_r;
 
     task StartRead;
         input [4:0] addr;
         begin
             avm_read_w = 1;
             avm_write_w = 0;
-            avm_address_w = addr;
-        end
-    endtask
-    task StartWrite;
-        input [4:0] addr;
-        begin
-            avm_read_w = 0;
-            avm_write_w = 1;
             avm_address_w = addr;
         end
     endtask
@@ -61,14 +59,25 @@ module RS232(
             S_PREPARE: begin
                 if(~avm_waitrequest & avm_readdata[RX_OK_BIT]) begin
                     StartRead(RX_BASE);
-                    bytes_counter_w = bytes_counter_r + 1;
-                    state_w = S_GET_DATA;
                     pixel_value_w = pixel_value_r;
+                    addr_store_w = addr_store_r;
+                    if(bytes_counter_r < IMAGE_SIZE) begin
+                        state_w = S_GET_DATA;
+                        bytes_counter_w = bytes_counter_r + 1;
+                        store_finish_w = 1'b0;
+                    end
+                    else begin
+                        state_w = state_r;
+                        bytes_counter_w = bytes_counter_r;
+                        store_finish_w = 1'b1;
+                    end
                 end
                 else begin 
                     bytes_counter_w = bytes_counter_r;
                     state_w = state_r;
                     pixel_value_w = pixel_value_r;
+                    addr_store_w = addr_store_r;
+                    store_finish_w = 1'b0;
                 end
             end
             S_GET_DATA: begin
@@ -76,16 +85,21 @@ module RS232(
                 if(~avm_waitrequest) begin
                     StartRead(STATUS_BASE);
                     state_w = S_PREPARE;
-                    if(bytes_counter_r == 20'd150000) begin
-                        pixel_value_w = avm_readdata[7:0];
-                    end
-                    else begin
-                        pixel_value_w = pixel_value_r;
-                    end
+                    pixel_value_w = avm_readdata[7:0];
+                    addr_store_w = addr_store_r + 20'd1;
+                    store_finish_w = 1'b0;
+                    //if(bytes_counter_r == 20'd150000) begin
+                    //    pixel_value_w = avm_readdata[7:0];
+                    //end
+                    //else begin
+                    //    pixel_value_w = pixel_value_r;
+                    //end
                 end
                 else begin
                     state_w = state_r;
                     pixel_value_w = pixel_value_r;
+                    addr_store_w = addr_store_r;
+                    store_finish_w = 1'b0;
                 end
             end
         endcase
@@ -93,19 +107,23 @@ module RS232(
 
     always_ff @(posedge avm_clk or negedge avm_rst) begin
         if (!avm_rst) begin
-            avm_address_r <= STATUS_BASE;
-            avm_read_r <= 1;
-            avm_write_r <= 0;
-            state_r <= S_PREPARE;
-            pixel_value_r <= 8'b0;
+            avm_address_r   <= STATUS_BASE;
+            avm_read_r      <= 1;
+            avm_write_r     <= 0;
+            state_r         <= S_PREPARE;
+            pixel_value_r   <= 8'b0;
             bytes_counter_r <= 0;
+            addr_store_r    <= 0;
+            store_finish_r  <= 0;
         end else begin
-            avm_address_r <= avm_address_w;
-            avm_read_r <= avm_read_w;
-            avm_write_r <= avm_write_w;
-            state_r <= state_w;
-            pixel_value_r <= pixel_value_w;
+            avm_address_r   <= avm_address_w;
+            avm_read_r      <= avm_read_w;
+            avm_write_r     <= avm_write_w;
+            state_r         <= state_w;
+            pixel_value_r   <= pixel_value_w;
             bytes_counter_r <= bytes_counter_w;
+            addr_store_r    <= addr_store_w;
+            store_finish_r  <= store_finish_w;
         end
     end
 
