@@ -1,3 +1,4 @@
+`define IMAGE_NUMBER 4
 module Wrapper (
     //RS232
     input         avm_rst,
