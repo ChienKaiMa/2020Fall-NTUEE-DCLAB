@@ -13,7 +13,7 @@ s = Serial(
     rtscts=False
 )
 
-fp = open('mountain.bin', 'rb')
+fp = open('mountain.bmp', 'rb')
 fw = open('image.out', 'wb')
 assert fp
 
@@ -22,10 +22,12 @@ print(len(image))
 #fw.write(image)
 #s.write(image)
 
-for i in range(1077, len(image)):
-    s.write(image[i])
-    fw.write(image[i])
-    #print(len(image[i]))
+for i in range(len(image)-640, 1076, -640):
+    for j in range(1, 641, 1):
+        s.write(image[i+j-1])
+        #fw.write(image[i])
+        #print(len(image[i]))
+s.write(image[1076])
 
 fp.close()
 fw.close()
