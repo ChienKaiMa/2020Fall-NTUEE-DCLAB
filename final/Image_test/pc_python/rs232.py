@@ -2,9 +2,9 @@
 from serial import Serial, EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 from sys import argv
 
-assert len(argv) == 2
+#assert len(argv) == 2
 s = Serial(
-    port=argv[1],
+    port="COM5",#argv[1],
     baudrate=115200,
     bytesize=EIGHTBITS,
     parity=PARITY_NONE,

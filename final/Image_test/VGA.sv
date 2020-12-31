@@ -155,9 +155,9 @@ module vga(
                 end
                 else begin
                     addr_display_w = addr_display_r + 20'd1;
-                    vga_r_w = {i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
-                    vga_g_w = {i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
-                    vga_b_w = {i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
+                    vga_r_w = i_pixel_value[7:0];//{i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
+                    vga_g_w = i_pixel_value[7:0];//{i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
+                    vga_b_w = i_pixel_value[7:0];//{i_pixel_value[0], i_pixel_value[1], i_pixel_value[2], i_pixel_value[3], i_pixel_value[4], i_pixel_value[5], i_pixel_value[6], i_pixel_value[7]};//addr_display_r[15:8];
                 end
             end
         endcase
